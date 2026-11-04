@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SecureBank</title>
+<style>
+:root{--navy:#0b1f3a;--navy2:#14335c;--teal:#12b5a6;--teal2:#0e8f84;--bg:#f2f5fa;--card:#fff;--text:#16253b;--mute:#6b7a90;--line:#e3e9f2;--red:#d93a4a;--green:#1a9d5c;--amber:#e39b1b}
+*{box-sizing:border-box;margin:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+[hidden]{display:none!important}
+button{font:inherit;cursor:pointer}
+input,select{font:inherit}
+/* ---------- auth ---------- */
+#auth{display:grid;grid-template-columns:1.1fr 1fr;min-height:100vh}
+.hero{background:linear-gradient(145deg,var(--navy),var(--navy2) 60%,#1b4b7f);color:#fff;padding:56px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(18,181,166,.35),transparent 70%);right:-120px;bottom:-120px}
+.logo{display:flex;align-items:center;gap:12px;font-size:28px;font-weight:800;letter-spacing:.3px}
+.logo i{width:44px;height:44px;border-radius:12px;background:var(--teal);display:grid;place-items:center;font-style:normal;font-size:24px}
+.hero h2{font-size:38px;line-height:1.15;margin:36px 0 14px}
+.hero p{color:#b9c8de;max-width:430px;line-height:1.6}
+.feats{margin-top:30px;display:grid;gap:12px;z-index:1}
+.feats div{display:flex;gap:12px;align-items:center;color:#dbe6f6}
+.feats span{width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,.1);display:grid;place-items:center}
+.panel{display:flex;align-items:center;justify-content:center;padding:28px}
+.box{background:var(--card);width:100%;max-width:440px;border-radius:20px;box-shadow:0 12px 40px rgba(11,31,58,.12);padding:28px}
+.tabs{display:flex;background:var(--bg);border-radius:12px;padding:4px;margin-bottom:22px}
+.tabs button{flex:1;border:0;background:none;padding:10px;border-radius:9px;color:var(--mute);font-weight:600;transition:.2s}
+.tabs button.on{background:#fff;color:var(--navy);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+h3{font-size:20px;margin-bottom:4px}
+.sub{color:var(--mute);font-size:14px;margin-bottom:18px}
+label{display:block;font-size:13px;font-weight:600;color:var(--mute);margin:14px 0 6px}
+input,select{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--text);outline:none;transition:.15s}
+input:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(18,181,166,.15)}
+.btn{width:100%;margin-top:20px;padding:13px;border:0;border-radius:11px;background:linear-gradient(135deg,var(--teal),var(--teal2));color:#fff;font-weight:700;font-size:15px;transition:.15s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(18,181,166,.35)}
+.btn:disabled{opacity:.6;cursor:wait;transform:none;box-shadow:none}
+.btn.red{background:linear-gradient(135deg,#e5566a,var(--red))}
+.btn.ghost{background:#fff;color:var(--navy);border:1.5px solid var(--line)}
+.hint{font-size:12.5px;color:var(--mute);margin-top:14px;background:var(--bg);padding:10px 12px;border-radius:10px;line-height:1.5}
+.types{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.type{border:1.5px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;transition:.15s;text-align:left;background:#fff}
+.type b{display:block;margin-bottom:2px}.type small{color:var(--mute);font-size:12px;line-height:1.4;display:block}
+.type.on{border-color:var(--teal);background:rgba(18,181,166,.07);box-shadow:0 0 0 3px rgba(18,181,166,.12)}
+.msg{margin-top:14px;padding:11px 13px;border-radius:10px;font-size:14px;line-height:1.45}
+.msg.err{background:#fdecee;color:#a8222f;border:1px solid #f6c7cd}
+.msg.ok{background:#e8f7ef;color:#126b3f;border:1px solid #bfe6d0}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+/* ---------- app ---------- */
+#app{max-width:1100px;margin:0 auto;padding:20px}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.top .logo{font-size:22px;color:var(--navy)}.top .logo i{width:36px;height:36px;font-size:19px;color:#fff}
+.who{display:flex;align-items:center;gap:12px}
+.who .av{width:38px;height:38px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:700}
+.who small{display:block;color:var(--mute)}
+.out{border:1.5px solid var(--line);background:#fff;padding:8px 14px;border-radius:10px;font-weight:600;color:var(--navy)}
+.out:hover{background:var(--bg)}
+.grid{display:grid;grid-template-columns:1.15fr 1fr;gap:20px}
+.card{background:var(--card);border-radius:18px;padding:24px;box-shadow:0 4px 18px rgba(11,31,58,.06)}
+.bal{background:linear-gradient(135deg,var(--navy),var(--navy2) 70%,#1d5a94);color:#fff;position:relative;overflow:hidden;margin-bottom:20px}
+.bal:after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(18,181,166,.4),transparent 70%);right:-60px;top:-80px}
+.bal .row{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#b9c8de}
+.badge{background:rgba(255,255,255,.14);padding:4px 11px;border-radius:99px;font-size:12px;font-weight:700;color:#fff}
+.amt{font-size:42px;font-weight:800;margin:14px 0 4px;letter-spacing:-.5px}
+.amt.neg{color:#ffb3bb}
+.bar{height:8px;background:rgba(255,255,255,.15);border-radius:9px;margin-top:16px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--teal);border-radius:9px;transition:width .6s}
+.rule{font-size:13px;color:#b9c8de;margin-top:10px;position:relative;z-index:1}
+.atabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
+.atabs button{border:1.5px solid var(--line);background:#fff;padding:9px 15px;border-radius:10px;font-weight:600;color:var(--mute);transition:.15s}
+.atabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.chips{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.chips button{border:1px solid var(--line);background:var(--bg);padding:6px 12px;border-radius:99px;font-size:13px;color:var(--text)}
+.chips button:hover{border-color:var(--teal);color:var(--teal2)}
+.small{font-size:13px;color:var(--mute);margin-top:6px}
+.res{margin-top:16px;padding:14px;border-radius:12px;font-size:14px;line-height:1.6}
+.res.err{background:#fdecee;color:#a8222f;border:1px solid #f6c7cd}
+.res.ok{background:#e8f7ef;color:#126b3f;border:1px solid #bfe6d0}
+.txn{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.txn:last-child{border:0}
+.ic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-weight:800;flex:none}
+.ic.in{background:#e3f6ec;color:var(--green)}.ic.outg{background:#fdecee;color:var(--red)}.ic.int{background:#fff4dc;color:var(--amber)}
+.txn .m{flex:1;min-width:0}.txn .m b{display:block;font-size:14px}.txn .m small{color:var(--mute);font-size:12px}
+.txn .v{text-align:right;font-weight:700;font-size:14px}.txn .v small{display:block;color:var(--mute);font-weight:500;font-size:12px}
+.in-v{color:var(--green)}.out-v{color:var(--red)}
+.empty{color:var(--mute);text-align:center;padding:26px 0}
+.det{margin-top:16px;font-size:13px;color:var(--mute);background:var(--bg);padding:12px;border-radius:10px;line-height:1.5;word-break:break-word}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:14px}
+th{text-align:left;color:var(--mute);font-size:12px;padding:8px 6px;border-bottom:1px solid var(--line)}
+td{padding:10px 6px;border-bottom:1px solid var(--line)}
+.pill{padding:3px 9px;border-radius:99px;font-size:12px;font-weight:700}
+.pill.ok{background:#e3f6ec;color:var(--green)}.pill.lk{background:#fdecee;color:var(--red)}
+.mini{border:1.5px solid var(--teal);color:var(--teal2);background:#fff;border-radius:8px;padding:5px 10px;font-weight:700;font-size:12px}
+#toasts{position:fixed;top:18px;right:18px;display:grid;gap:10px;z-index:99}
+.toast{background:var(--navy);color:#fff;padding:13px 18px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:340px;font-size:14px;animation:in .3s}
+.toast.err{background:var(--red)}.toast.ok{background:var(--green)}
+@keyframes in{from{opacity:0;transform:translateX(30px)}}
+@media(max-width:860px){#auth{grid-template-columns:1fr}.hero{padding:32px}.hero h2{font-size:28px;margin-top:20px}.feats{display:none}.grid{grid-template-columns:1fr}.amt{font-size:34px}}
+</style>
+</head>
+<body>
+<div id="toasts"></div>
+
+<!-- =============== SIGN IN / OPEN / STAFF =============== -->
+<div id="auth">
+  <div class="hero">
+    <div class="logo"><i>🏦</i>SecureBank</div>
+    <h2>Simple, safe banking<br>for everyone.</h2>
+    <p>Open a Savings or Current account, move money instantly, and keep every transaction protected by your PIN.</p>
+    <div class="feats">
+      <div><span>🔒</span>PIN protected, locks after 3 wrong attempts</div>
+      <div><span>💸</span>Instant transfers between accounts</div>
+      <div><span>📈</span>4% yearly interest on Savings</div>
+    </div>
+  </div>
+  <div class="panel"><div class="box" id="box">
+    <div class="tabs" id="authTabs">
+      <button class="on" data-t="login">Sign in</button>
+      <button data-t="open">Open account</button>
+      <button data-t="staff">Staff</button>
+    </div>
+
+    <div id="t-login">
+      <h3>Welcome back</h3><p class="sub">Enter your account number and PIN.</p>
+      <label>Account number</label><input id="l-acc" inputmode="numeric" placeholder="e.g. 1001" maxlength="8">
+      <label>PIN</label><input id="l-pin" type="password" inputmode="numeric" maxlength="4" placeholder="••••">
+      <div id="l-msg"></div>
+      <button class="btn" id="l-btn">Sign in</button>
+      <div class="hint">Demo accounts: <b>1001</b> / PIN <b>1234</b> (Savings) &nbsp;·&nbsp; <b>2001</b> / PIN <b>4321</b> (Current)</div>
+    </div>
+
+    <div id="t-open" hidden>
+      <h3>Open a new account</h3><p class="sub">Takes less than a minute.</p>
+      <div class="types">
+        <div class="type on" data-ty="Savings"><b>💰 Savings</b><small>Min balance Rs. 1,000<br>4% yearly interest</small></div>
+        <div class="type" data-ty="Current"><b>💼 Current</b><small>Overdraft up to Rs. 5,000<br>No minimum</small></div>
+      </div>
+      <label>Full name</label><input id="o-name" maxlength="50" placeholder="Your full name">
+      <label>Choose a 4-digit PIN</label><input id="o-pin" type="password" inputmode="numeric" maxlength="4" placeholder="••••">
+      <label>Confirm PIN</label><input id="o-pin2" type="password" inputmode="numeric" maxlength="4" placeholder="••••">
+      <label>Opening deposit (Rs.)</label><input id="o-dep" inputmode="decimal" placeholder="1000">
+      <div class="small" id="o-note">Savings needs at least Rs. 1,000 to open.</div>
+      <div id="o-msg"></div>
+      <button class="btn" id="o-btn">Open account</button>
+    </div>
+
+    <div id="t-staff" hidden>
+      <h3>Staff area</h3><p class="sub">View accounts and unlock locked accounts.</p>
+      <label>Staff code</label><input id="s-code" type="password" placeholder="Staff code">
+      <div id="s-msg"></div>
+      <button class="btn" id="s-btn">Open staff panel</button>
+      <div id="s-list"></div>
+      <div class="hint" id="s-hint">Default staff code: <b>admin123</b></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- =============== DASHBOARD =============== -->
+<div id="app" hidden>
+  <div class="top">
+    <div class="logo"><i>🏦</i>SecureBank</div>
+    <div class="who">
+      <div class="av" id="av"></div>
+      <div><b id="wName"></b><small id="wAcc"></small></div>
+      <button class="out" id="logout">Sign out</button>
+    </div>
+  </div>
+  <div class="grid">
+    <div>
+      <div class="card bal">
+        <div class="row"><span>Available balance</span><span class="badge" id="bType"></span></div>
+        <div class="amt" id="bAmt">Rs. 0.00</div>
+        <div class="row"><span id="bAvail"></span></div>
+        <div class="bar"><i id="bBar" style="width:0"></i></div>
+        <div class="rule" id="bRule"></div>
+      </div>
+      <div class="card">
+        <div class="atabs" id="aTabs">
+          <button class="on" data-a="deposit">⬇ Deposit</button>
+          <button data-a="withdraw">⬆ Withdraw</button>
+          <button data-a="transfer">⇄ Transfer</button>
+          <button data-a="interest" id="intTab">% Interest</button>
+        </div>
+        <div id="a-deposit"><label style="margin-top:0">Amount (Rs.)</label><input class="amtIn" inputmode="decimal" placeholder="0.00">
+          <div class="chips"></div><button class="btn" data-do="deposit">Deposit money</button></div>
+        <div id="a-withdraw" hidden><label style="margin-top:0">Amount (Rs.)</label><input class="amtIn" inputmode="decimal" placeholder="0.00">
+          <div class="small" id="wLimit"></div><div class="chips"></div><button class="btn" data-do="withdraw">Withdraw money</button></div>
+        <div id="a-transfer" hidden><label style="margin-top:0">To account number</label><input id="tTo" inputmode="numeric" maxlength="8" placeholder="e.g. 2001">
+          <div class="small" id="tName"></div>
+          <label>Amount (Rs.)</label><input class="amtIn" inputmode="decimal" placeholder="0.00">
+          <div class="chips"></div><button class="btn" data-do="transfer">Send money</button></div>
+        <div id="a-interest" hidden><p class="sub" style="margin:0">Savings accounts earn <b>4% yearly interest</b>. Apply it to your current balance.</p>
+          <div class="small" id="intPreview"></div><button class="btn" data-do="interest">Apply 4% interest</button></div>
+        <div id="result"></div>
+      </div>
+    </div>
+    <div class="card" style="align-self:start">
+      <h3>Last 5 transactions</h3><p class="sub">Your most recent activity.</p>
+      <div id="txns"></div>
+      <div class="det" id="det"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const fmt=v=>"Rs. "+Number(v).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let session=null, acct=null, idleTimer=null, shownBal=0, openType="Savings", staffCode="";
+
+async function api(path,data={}){
+  let r; try{ r=await fetch(path,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams(data)}); }
+  catch(e){ throw {error:"Cannot reach the server. Is SecureBank still running?"}; }
+  const j=await r.json().catch(()=>({ok:false,error:"Unexpected server reply."}));
+  if(!j.ok) throw j; return j;
+}
+function toast(t,kind=""){const d=document.createElement("div");d.className="toast "+kind;d.textContent=t;$("#toasts").appendChild(d);setTimeout(()=>d.remove(),4200)}
+function show(el,html,kind){el.innerHTML=html?`<div class="msg ${kind}">${html}</div>`:""}
+function shake(){const b=$("#app").hidden?$("#box"):$("#result");b.classList.remove("shake");void b.offsetWidth;b.classList.add("shake")}
+async function busy(btn,fn){const old=btn.textContent;btn.disabled=true;btn.textContent="Please wait…";try{await fn()}finally{btn.disabled=false;btn.textContent=old}}
+const digits=e=>e.target.value=e.target.value.replace(/\D/g,"");
+["#l-acc","#l-pin","#o-pin","#o-pin2","#tTo"].forEach(s=>$(s).addEventListener("input",digits));
+
+/* ---------- auth tabs ---------- */
+$$("#authTabs button").forEach(b=>b.onclick=()=>{
+  $$("#authTabs button").forEach(x=>x.classList.toggle("on",x===b));
+  ["login","open","staff"].forEach(t=>$("#t-"+t).hidden=t!==b.dataset.t);
+});
+$$(".type").forEach(t=>t.onclick=()=>{
+  openType=t.dataset.ty;$$(".type").forEach(x=>x.classList.toggle("on",x===t));
+  $("#o-note").textContent=openType==="Savings"?"Savings needs at least Rs. 1,000 to open.":"Current accounts can open with any amount (even Rs. 0).";
+  $("#o-dep").placeholder=openType==="Savings"?"1000":"0";
+});
+
+/* ---------- sign in ---------- */
+async function doLogin(){
+  const acc=$("#l-acc").value.trim(), pin=$("#l-pin").value;
+  if(!acc) return show($("#l-msg"),"Enter your account number.","err"),shake();
+  if(pin.length!==4) return show($("#l-msg"),"PIN must be 4 digits.","err"),shake();
+  await busy($("#l-btn"),async()=>{
+    try{const j=await api("/api/login",{acc,pin});session={acc,pin};show($("#l-msg"),"");$("#l-pin").value="";enter(j);toast(j.message,"ok")}
+    catch(e){show($("#l-msg"),esc(e.error),"err");$("#l-pin").value="";shake()}
+  });
+}
+$("#l-btn").onclick=doLogin;
+["#l-acc","#l-pin"].forEach(s=>$(s).addEventListener("keydown",e=>e.key==="Enter"&&doLogin()));
+
+/* ---------- open account ---------- */
+$("#o-btn").onclick=async()=>{
+  const name=$("#o-name").value, pin=$("#o-pin").value, dep=$("#o-dep").value.trim()||"0";
+  if(name.trim().length<2) return show($("#o-msg"),"Please enter your name.","err"),shake();
+  if(pin.length!==4) return show($("#o-msg"),"PIN must be exactly 4 digits.","err"),shake();
+  if(pin!==$("#o-pin2").value) return show($("#o-msg"),"The two PINs do not match.","err"),shake();
+  await busy($("#o-btn"),async()=>{
+    try{const j=await api("/api/open",{type:openType,name,pin,deposit:dep});
+      toast("Account opened! Your number is "+j.accountNo,"ok");
+      ["#o-name","#o-pin","#o-pin2","#o-dep"].forEach(s=>$(s).value="");show($("#o-msg"),"");
+      $("#authTabs button[data-t=login]").click();$("#l-acc").value=j.accountNo;
+      show($("#l-msg"),`Your new account number is <b>${j.accountNo}</b>. Sign in with your PIN.`,"ok");$("#l-pin").focus()}
+    catch(e){show($("#o-msg"),esc(e.error),"err");shake()}
+  });
+};
+
+/* ---------- staff ---------- */
+async function loadStaff(){
+  const j=await api("/api/staff/list",{code:staffCode});
+  $("#s-hint").hidden=true;
+  $("#s-list").innerHTML=`<table><tr><th>No.</th><th>Name</th><th>Type</th><th>Balance</th><th>Status</th></tr>`+
+   j.accounts.map(a=>`<tr><td>${a.accountNo}</td><td>${esc(a.name)}</td><td>${a.type}</td><td>${fmt(a.balance)}</td>
+   <td>${a.locked?`<button class="mini" data-un="${a.accountNo}">Unlock</button>`:'<span class="pill ok">Active</span>'}</td></tr>`).join("")+"</table>";
+  $$("[data-un]").forEach(b=>b.onclick=async()=>{try{const r=await api("/api/staff/unlock",{code:staffCode,acc:b.dataset.un});toast(r.message,"ok");loadStaff()}catch(e){toast(e.error,"err")}});
+}
+$("#s-btn").onclick=async()=>{staffCode=$("#s-code").value;await busy($("#s-btn"),async()=>{
+  try{await loadStaff();show($("#s-msg"),"")}catch(e){show($("#s-msg"),esc(e.error),"err");$("#s-list").innerHTML="";shake()}})};
+$("#s-code").addEventListener("keydown",e=>e.key==="Enter"&&$("#s-btn").click());
+
+/* ---------- dashboard ---------- */
+function enter(j){$("#auth").hidden=true;$("#app").hidden=false;shownBal=0;render(j);setAction("deposit");resetIdle()}
+function leave(msg){session=null;acct=null;$("#app").hidden=true;$("#auth").hidden=false;$("#result").innerHTML="";
+  $$(".amtIn,#tTo").forEach(i=>i.value="");$("#tName").textContent="";if(msg)toast(msg)}
+$("#logout").onclick=()=>leave("Signed out safely.");
+
+function animateBalance(to){
+  const from=shownBal,t0=performance.now(),d=600;shownBal=to;
+  (function step(t){const k=Math.min(1,(t-t0)/d),e=1-Math.pow(1-k,3),v=from+(to-from)*e;
+    $("#bAmt").textContent=fmt(v);$("#bAmt").classList.toggle("neg",v<0);if(k<1)requestAnimationFrame(step)})(t0);
+}
+function render(j){
+  acct=j.account;const a=acct;
+  $("#av").textContent=a.name[0].toUpperCase();$("#wName").textContent=a.name;$("#wAcc").textContent=a.type+" · A/C "+a.accountNo;
+  $("#bType").textContent=a.type;animateBalance(a.balance);
+  $("#bAvail").textContent="You can withdraw up to "+fmt(a.available);$("#bRule").textContent=a.rule;
+  const sav=a.type==="Savings";
+  $("#bBar").style.width=(sav?Math.min(100,a.balance/Math.max(a.balance,25000)*100):Math.max(0,Math.min(100,(a.available/(a.balance>0?a.balance+5000:5000))*100)))+"%";
+  $("#intTab").hidden=!sav;
+  $("#wLimit").textContent="Maximum withdrawal right now: "+fmt(a.available);
+  $("#intPreview").innerHTML=sav?`Interest on your balance: <b>${fmt(Math.round(a.balance*4)/100)}</b>`:"";
+  $("#det").textContent=a.summary;
+  $("#txns").innerHTML=j.transactions.length?j.transactions.map(t=>{
+    const inn=["DEPOSIT","TRANSFER_IN","OPEN"].includes(t.type),int=t.type==="INTEREST";
+    const cls=int?"int":inn?"in":"outg",sym=int?"%":inn?"↓":"↑",sign=inn||int?"+":"-";
+    const label={OPEN:"Account opened",DEPOSIT:"Deposit",WITHDRAW:"Withdrawal",TRANSFER_OUT:"Transfer sent",TRANSFER_IN:"Transfer received",INTEREST:"Interest"}[t.type];
+    return `<div class="txn"><div class="ic ${cls}">${sym}</div><div class="m"><b>${label}</b><small>${esc(t.note)} · ${esc(t.time)}</small></div>
+      <div class="v ${inn||int?"in-v":"out-v"}">${sign}${fmt(t.amount)}<small>Bal ${fmt(t.balanceAfter)}</small></div></div>`}).join("")
+    :'<div class="empty">No transactions yet</div>';
+  const quick=sav?[500,1000,5000]:[500,1000,5000];
+  $$(".chips").forEach(c=>c.innerHTML=quick.map(q=>`<button data-q="${q}">+${q.toLocaleString("en-IN")}</button>`).join(""));
+  $$(".chips button").forEach(b=>b.onclick=()=>b.closest("[id^=a-]").querySelector(".amtIn").value=b.dataset.q);
+}
+function setAction(a){
+  $$("#aTabs button").forEach(b=>b.classList.toggle("on",b.dataset.a===a));
+  ["deposit","withdraw","transfer","interest"].forEach(x=>$("#a-"+x).hidden=x!==a);$("#result").innerHTML="";
+}
+$$("#aTabs button").forEach(b=>b.onclick=()=>{setAction(b.dataset.a);resetIdle()});
+
+let lookupTimer;
+$("#tTo").addEventListener("input",()=>{
+  clearTimeout(lookupTimer);const v=$("#tTo").value;const out=$("#tName");out.textContent="";
+  if(v.length<4)return;
+  lookupTimer=setTimeout(async()=>{try{const j=await api("/api/lookup",{acc:v});
+    out.innerHTML=j.name?(v===session.acc?"⚠️ That is your own account.":`✅ Account holder: <b>${esc(j.name)}</b>`):"❌ No account with this number.";}catch(e){}},300);
+});
+
+$$("[data-do]").forEach(btn=>btn.onclick=async()=>{
+  const kind=btn.dataset.do,res=$("#result");res.innerHTML="";resetIdle();
+  const data={acc:session.acc,pin:session.pin};
+  if(kind!=="interest"){
+    const v=btn.closest("[id^=a-]").querySelector(".amtIn").value.trim();
+    if(!v||isNaN(v)||Number(v)<=0){res.innerHTML='<div class="res err">Please enter an amount greater than zero.</div>';return}
+    data.amount=v;
+  }
+  if(kind==="transfer"){
+    data.to=$("#tTo").value.trim();
+    if(!data.to){res.innerHTML='<div class="res err">Enter the destination account number.</div>';return}
+    if(!confirm(`Send ${fmt(data.amount)} to account ${data.to}?`))return;
+  }
+  await busy(btn,async()=>{
+    try{const j=await api("/api/"+kind,data);render(j);res.innerHTML=`<div class="res ok">✅ ${esc(j.message)}</div>`;toast(j.message,"ok");
+      btn.closest("[id^=a-]").querySelectorAll("input").forEach(i=>i.value="");$("#tName").textContent=""}
+    catch(e){
+      let h="❌ Transaction failed: "+esc(e.error);
+      if(e.shortfall!==undefined)h+=`<br><b>Shortfall: ${fmt(e.shortfall)}</b>`;
+      res.innerHTML=`<div class="res err">${h}</div>`;shake();
+      if(/locked/i.test(e.error||""))setTimeout(()=>leave("Account locked. Contact bank staff."),2500);
+    }
+  });
+});
+
+/* auto sign-out after 3 minutes of no activity */
+function resetIdle(){clearTimeout(idleTimer);if(session)idleTimer=setTimeout(()=>leave("Signed out after 3 minutes of inactivity."),180000)}
+["click","keydown","mousemove"].forEach(ev=>document.addEventListener(ev,()=>{if(session)resetIdle()}));
+</script>
+</body>
+</html>
